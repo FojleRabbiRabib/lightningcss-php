@@ -65,7 +65,7 @@ jobs:
         run: vendor/bin/phpcs
 
       - name: PHPStan
-        run: vendor/bin/phpstan analyse --no-progress
+        run: tools/phpstan.sh
 
   build:
     name: Build PHP ${{ matrix.php }}

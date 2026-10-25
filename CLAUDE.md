@@ -21,7 +21,7 @@ The project's full rulebook lives in session memory (not tracked here, by policy
 1. `clang-format-14 --dry-run --Werror` over C sources (never on `*_arginfo.h`).
 2. `cargo fmt --check` + `cargo clippy -- -D warnings` on `native/`.
 3. `php -l` on the stub and all PHP files; `vendor/bin/phpcs` (PSR-12);
-   `vendor/bin/phpstan analyse`.
+   `tools/phpstan.sh`.
 4. Builds with `-Wall -Wextra -Werror` — zero warnings, 8.3 first, then 8.4, then 8.5
    (`tools/build.sh` enforces the order and gates each artifact).
 5. `tools/elf-gates.sh build/<ver>/modules/lightningcss.so` — RELRO, BIND_NOW, non-exec

@@ -1,7 +1,13 @@
 parameters:
     level: 7
     paths:
-        - lightningcss.stub.php
+        - tests
+        - tools
     excludePaths:
+        # Vendored upstream tooling: gen_stub.php is php-src's generator and
+        # is analysed by its own project, not held to this repository's
+        # level-7 bar.
         - tools/gen_stub.php
+    scanFiles:
+        - lightningcss.stub.php
     tmpDir: build/phpstan

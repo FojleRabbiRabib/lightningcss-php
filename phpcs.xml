@@ -1,15 +1,25 @@
 <?xml version="1.0"?>
 <ruleset name="lightningcss">
-    <description>PSR-12 coding standard for lightningcss-php</description>
+    <description>PHP standard for the lightningcss extension: PSR-12 with two documented exceptions.</description>
 
-    <rule ref="PSR12"/>
+    <rule ref="PSR12">
+        <!-- The extension stub declares the whole public API in one file by design;
+             one-class-per-file targets runtime classes. -->
+        <exclude name="PSR1.Classes.ClassDeclaration.MultipleClasses"/>
+        <!-- Test libraries and tools, as they land, are executable diagnostics:
+             defining helper symbols and executing the diagnostic in one file is
+             their design. -->
+        <exclude name="PSR1.Files.SideEffects"/>
+    </rule>
 
-    <file>lightningcss.stub.php</file>
-
-    <exclude-pattern>tools/gen_stub.php</exclude-pattern>
-    <exclude-pattern>vendor/*</exclude-pattern>
-    <exclude-pattern>build/*</exclude-pattern>
-
+    <arg name="extensions" value="php"/>
     <arg name="colors"/>
     <arg value="sp"/>
+
+    <!-- Vendored upstream tooling follows php-src's own style, not PSR-12. -->
+    <exclude-pattern>tools/gen_stub\.php</exclude-pattern>
+
+    <file>lightningcss.stub.php</file>
+    <file>tests</file>
+    <file>tools</file>
 </ruleset>
