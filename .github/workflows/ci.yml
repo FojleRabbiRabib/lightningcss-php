@@ -89,6 +89,5 @@ jobs:
       - name: Build, gate, and test
         run: |
           set -euo pipefail
-          tools/build.sh
-          ver="$(php -r 'echo PHP_MAJOR_VERSION, ".", PHP_MINOR_VERSION;')"
-          php "build/${ver}/run-tests.php" -n -d extension="$PWD/build/${ver}/modules/lightningcss.so" tests/
+          tools/build.sh "${{ matrix.php }}"
+          php "build/${{ matrix.php }}/run-tests.php" -n -d extension="$PWD/build/${{ matrix.php }}/modules/lightningcss.so" tests/

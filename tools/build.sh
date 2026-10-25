@@ -46,33 +46,43 @@ else
     (cd "${root}/native" && cargo build --release --locked)
 fi
 
-for ver in 8.3 8.4 8.5; do
-    # Versioned toolchains first (multi-ABI workstation layout). Two honest
-    # modes: when NO versioned toolchain exists anywhere (single-version CI
-    # containers ship phpize + headers without wrappers), a version that does
-    # not match the container's php is skipped quietly; when versioned
-    # toolchains exist, a missing one is a hard failure — a broken ABI is
-    # never silently skipped.
-    php_bin="/usr/bin/php${ver}"
-    php_config="/usr/bin/php-config${ver}"
-    phpize_bin="/usr/bin/phpize${ver}"
-    if [[ ! -x "$php_bin" || ! -x "$php_config" || ! -x "$phpize_bin" ]]; then
-        unversioned_ok=0
-        if command -v php >/dev/null 2>&1 \
-            && [[ "$(php -r 'echo PHP_VERSION;' 2>/dev/null | cut -d. -f1,2)" = "$ver" ]] \
-            && command -v php-config >/dev/null 2>&1 && command -v phpize >/dev/null 2>&1; then
-            php_bin="$(command -v php)"
-            php_config="$(command -v php-config)"
-            phpize_bin="$(command -v phpize)"
-            unversioned_ok=1
-        fi
-        if [[ "$unversioned_ok" != "1" ]]; then
-            if compgen -G '/usr/bin/php-config*' > /dev/null; then
-                echo "FAIL: php ${ver} toolchain missing ($php_bin / $php_config / $phpize_bin)" >&2
-                failed+=("${ver}:toolchain")
-            fi
-            continue
-        fi
+TARGET_VER="${1:-${PHP_VERSION:-all}}"
+if [[ "$TARGET_VER" = "all" ]]; then
+    VERSIONS=(8.3 8.4 8.5)
+else
+    case "$TARGET_VER" in
+        8.3|8.4|8.5) VERSIONS=("$TARGET_VER") ;;
+        *) echo "FAIL: unsupported version '$TARGET_VER' (expected: 8.3, 8.4, 8.5, or all)" >&2; exit 2 ;;
+    esac
+fi
+
+for ver in "${VERSIONS[@]}"; do
+    php_bin="php${ver}"
+    php_config="php-config${ver}"
+    phpize_bin="phpize${ver}"
+
+    if command -v "$php_bin" >/dev/null 2>&1 \
+        && command -v "$php_config" >/dev/null 2>&1 \
+        && command -v "$phpize_bin" >/dev/null 2>&1; then
+        php_bin="$(command -v "$php_bin")"
+        php_config="$(command -v "$php_config")"
+        phpize_bin="$(command -v "$phpize_bin")"
+    elif [[ -x "/usr/bin/php${ver}" ]] \
+        && [[ -x "/usr/bin/php-config${ver}" ]] \
+        && [[ -x "/usr/bin/phpize${ver}" ]]; then
+        php_bin="/usr/bin/php${ver}"
+        php_config="/usr/bin/php-config${ver}"
+        phpize_bin="/usr/bin/phpize${ver}"
+    elif command -v php >/dev/null 2>&1 \
+        && [[ "$(php -r 'echo PHP_MAJOR_VERSION, ".", PHP_MINOR_VERSION;' 2>/dev/null)" = "$ver" ]] \
+        && command -v php-config >/dev/null 2>&1 && command -v phpize >/dev/null 2>&1; then
+        php_bin="$(command -v php)"
+        php_config="$(command -v php-config)"
+        phpize_bin="$(command -v phpize)"
+    else
+        echo "FAIL: php ${ver} toolchain missing" >&2
+        failed+=("${ver}:toolchain")
+        continue
     fi
 
     build_dir="${root}/build/${ver}"
