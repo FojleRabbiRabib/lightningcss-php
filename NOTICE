@@ -1,0 +1,12 @@
+lightningcss-php
+Copyright 2026 Fojle Rabbi (Rabib)
+
+This product is licensed under the Apache License, Version 2.0 (the "LICENSE" file).
+
+This product statically links Lightning CSS — https://github.com/parcel-bundler/lightningcss —
+Copyright the Parcel team, licensed under the Mozilla Public License, Version 2.0. The exact
+upstream revision is pinned per release; the pin is recorded in the release notes, the tag
+message, and php_lightningcss.h. MPL-covered files remain subject to MPL-2.0; the corresponding
+source, including any modifications, is made available with each release.
+
+Other bundled components carry their own licences as noted in their files.

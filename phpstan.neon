@@ -1,0 +1,7 @@
+parameters:
+    level: 7
+    paths:
+        - lightningcss.stub.php
+    excludePaths:
+        - tools/gen_stub.php
+    tmpDir: build/phpstan

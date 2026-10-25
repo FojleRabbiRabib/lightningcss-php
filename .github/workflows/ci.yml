@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    name: Static gates
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install clang-format-14
+        run: sudo apt-get update && sudo apt-get install -y clang-format-14
+
+      - name: C formatting gate
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=()
+          for f in ./*.c ./*.h ./native/include/*.h; do
+            case "$f" in *_arginfo.h) continue ;; esac
+            files+=("$f")
+          done
+          if [ "${#files[@]}" -eq 0 ]; then
+            exit 0
+          fi
+          clang-format-14 --dry-run --Werror "${files[@]}"
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Rust formatting gate
+        run: cargo fmt --check --manifest-path native/Cargo.toml
+
+      - name: Rust clippy gate
+        run: cargo clippy --manifest-path native/Cargo.toml --release -- -D warnings
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+
+      - name: Composer install
+        run: composer install --no-interaction --no-progress
+
+      - name: PHP lint
+        run: |
+          php -l lightningcss.stub.php
+          php -l tools/gen_stub.php
+
+      - name: Arginfo drift gate
+        run: |
+          php tools/gen_stub.php lightningcss.stub.php
+          git diff --exit-code lightningcss_arginfo.h
+
+      - name: PHP_CodeSniffer
+        run: vendor/bin/phpcs
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --no-progress
+
+  build:
+    name: Build PHP ${{ matrix.php }}
+    needs: [static]
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["8.3", "8.4", "8.5"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Build, gate, and test
+        run: |
+          set -euo pipefail
+          tools/build.sh
+          ver="$(php -r 'echo PHP_MAJOR_VERSION, ".", PHP_MINOR_VERSION;')"
+          php "build/${ver}/run-tests.php" -n -d extension="$PWD/build/${ver}/modules/lightningcss.so" tests/
