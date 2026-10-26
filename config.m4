@@ -16,14 +16,16 @@ PHP_ARG_ENABLE([lightningcss],
 
 if test "$PHP_LIGHTNINGCSS" != "no"; then
 
-  dnl Toolchain check. The scaffold shim is edition 2021 (MSRV 1.75); the
-  dnl engine dependency raises this floor when it lands, and this check is
-  dnl bumped with it. rustup installs to ~/.cargo/bin, which is not always
-  dnl ahead of a distro cargo on PATH, so an MSRV-failing PATH cargo falls
-  dnl back to that location before giving up.
+  dnl Toolchain check. The floor is the resolved dependency tree's own
+  dnl maximum (uuid 1.29 declares 1.89; indexmap/hashbrown/
+  dnl unicode-segmentation declare 1.85) — cargo refuses older toolchains on
+  dnl their behalf, so configure fails early here with the same number.
+  dnl rustup installs to ~/.cargo/bin, which is not always ahead of a distro
+  dnl cargo on PATH, so an MSRV-failing PATH cargo falls back to that
+  dnl location before giving up.
   AC_CHECK_PROG([LIGHTNINGCSS_CARGO], [cargo], [cargo], [no])
   if test "$LIGHTNINGCSS_CARGO" = "no"; then
-    AC_MSG_ERROR([cargo not found. lightningcss builds its shim from Rust source and needs a Rust toolchain >= 1.75; install rustup and re-run configure.])
+    AC_MSG_ERROR([cargo not found. lightningcss builds its shim from Rust source and needs a Rust toolchain >= 1.89; install rustup and re-run configure.])
   fi
 
   lightningcss_cargo_ok() {
@@ -32,7 +34,7 @@ if test "$PHP_LIGHTNINGCSS" != "no"; then
     major=`printf '%s' "$v" | cut -d. -f1`
     minor=`printf '%s' "$v" | cut -d. -f2`
     test -n "$major" && test "$major" -ge 1 || return 1
-    test "$major" -gt 1 || test "$minor" -ge 75
+    test "$major" -gt 1 || test "$minor" -ge 89
   }
 
   LIGHTNINGCSS_CARGO_VERSION=`$LIGHTNINGCSS_CARGO --version 2>/dev/null | awk '{ print $2 }'`
@@ -41,7 +43,7 @@ if test "$PHP_LIGHTNINGCSS" != "no"; then
       LIGHTNINGCSS_CARGO="$HOME/.cargo/bin/cargo"
       LIGHTNINGCSS_CARGO_VERSION=`$LIGHTNINGCSS_CARGO --version 2>/dev/null | awk '{ print $2 }'`
     else
-      AC_MSG_ERROR([cargo $LIGHTNINGCSS_CARGO_VERSION is older than the shim MSRV of 1.75. Install a current toolchain with rustup and re-run configure.])
+      AC_MSG_ERROR([cargo $LIGHTNINGCSS_CARGO_VERSION is older than the shim MSRV of 1.89. Install a current toolchain with rustup and re-run configure.])
     fi
   fi
   PHP_SUBST([LIGHTNINGCSS_CARGO])

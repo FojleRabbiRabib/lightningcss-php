@@ -16,7 +16,7 @@ source maps) is being implemented next; every capability will be proposed before
 ## Requirements
 
 - PHP 8.3, 8.4, or 8.5 (development headers required for source builds)
-- Rust toolchain >= 1.75 (managed via [rustup](https://rustup.rs))
+- Rust toolchain >= 1.89 (managed via [rustup](https://rustup.rs))
 - C compiler with C99 support (GCC or Clang)
 - Linux (x86_64, aarch64)
 
@@ -25,6 +25,9 @@ source maps) is being implemented next; every capability will be proposed before
 ### From source
 
 ```bash
+# Fetch and vendor upstream Lightning CSS engine and crates:
+tools/fetch-lightningcss.sh
+
 # Multi-ABI build (builds all installed PHP versions):
 tools/build.sh
 

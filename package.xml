@@ -31,8 +31,7 @@ build); the CSS processing API lands next.</description>
  <license uri="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</license>
  <notes>
 Skeleton release: extension base surface only (Lightningcss\Exception,
-lightningcss.max_input_bytes). Vendored upstream pin: unreleased-skeleton
-(first engine pin lands with the processing API).
+lightningcss.max_input_bytes). Vendored upstream pin: 1.33.0.
  </notes>
  <contents>
   <dir name="/">
@@ -49,6 +48,7 @@ lightningcss.max_input_bytes). Vendored upstream pin: unreleased-skeleton
    <file role="src" name="tools/fetch-lightningcss.sh"/>
    <file role="src" name="native/Cargo.toml"/>
    <file role="src" name="native/Cargo.lock"/>
+   <file role="src" name="native/.cargo/config.toml"/>
    <file role="src" name="native/include/lightningcss_php_shim.h"/>
    <file role="src" name="native/src/lib.rs"/>
    <file role="test" name="tests/001_load.phpt"/>

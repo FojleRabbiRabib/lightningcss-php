@@ -36,14 +36,16 @@ export LIGHTNINGCSS_NATIVE_DIR="${root}/native"
 export PATH="$HOME/.cargo/bin:$PATH"
 
 # DEBUG=1 handling: pre-build the cargo profile and export the archive path.
+# --offline: the build is hermetic — crates resolve from the verified vendor
+# tree (native/.cargo/config.toml source replacement), never the network.
 if [[ "${DEBUG:-0}" = "1" ]]; then
     export LIGHTNINGCSS_DEBUG=1
     export LIGHTNINGCSS_ARCHIVE="${root}/native/target/debug/liblightningcss_php.a"
-    (cd "${root}/native" && cargo build --locked)
+    (cd "${root}/native" && cargo build --locked --offline)
 else
     export LIGHTNINGCSS_DEBUG=0
     export LIGHTNINGCSS_ARCHIVE="${root}/native/target/release/liblightningcss_php.a"
-    (cd "${root}/native" && cargo build --release --locked)
+    (cd "${root}/native" && cargo build --release --locked --offline)
 fi
 
 TARGET_VER="${1:-${PHP_VERSION:-all}}"

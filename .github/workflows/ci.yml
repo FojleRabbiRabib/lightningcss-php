@@ -36,11 +36,15 @@ jobs:
         with:
           components: rustfmt, clippy
 
+      - name: Fetch and vendor the pinned engine
+        run: tools/fetch-lightningcss.sh
+
       - name: Rust formatting gate
         run: cargo fmt --check --manifest-path native/Cargo.toml
 
       - name: Rust clippy gate
-        run: cargo clippy --manifest-path native/Cargo.toml --release -- -D warnings
+        working-directory: native
+        run: cargo clippy --release --locked --offline -- -D warnings
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -85,6 +89,9 @@ jobs:
           coverage: none
 
       - uses: dtolnay/rust-toolchain@stable
+
+      - name: Fetch and vendor the pinned engine
+        run: tools/fetch-lightningcss.sh
 
       - name: Build, gate, and test
         run: |

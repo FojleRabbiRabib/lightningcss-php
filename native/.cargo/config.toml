@@ -1,0 +1,15 @@
+# lightningcss-php — hermetic cargo source replacement.
+#
+# Registry crates resolve from the SHA-256-verified fetch's vendor tree
+# (vendor-src/cargo-vendor, produced by tools/fetch-lightningcss.sh), never
+# the network. The engine itself is a path dependency on
+# vendor-src/lightningcss-1.33.0 and needs no replacement. The relative path
+# is resolved against this file's parent directory (native/).
+# Copyright 2026 Fojle Rabbi (Rabib)
+# SPDX-License-Identifier: Apache-2.0
+
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "../vendor-src/cargo-vendor"

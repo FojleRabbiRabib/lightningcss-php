@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 $(LIGHTNINGCSS_ARCHIVE): $(LIGHTNINGCSS_NATIVE_DIR)/Cargo.toml $(LIGHTNINGCSS_NATIVE_DIR)/Cargo.lock $(wildcard $(LIGHTNINGCSS_NATIVE_DIR)/src/*.rs)
-	cd $(LIGHTNINGCSS_NATIVE_DIR) && $(LIGHTNINGCSS_CARGO) build $(LIGHTNINGCSS_CARGO_PROFILE) --locked
+	cd $(LIGHTNINGCSS_NATIVE_DIR) && $(LIGHTNINGCSS_CARGO) build $(LIGHTNINGCSS_CARGO_PROFILE) --locked --offline
 
 # Force the archive to exist before the extension is linked — both the in-tree
 # link target and the install copy. The build driver runs cargo itself first,

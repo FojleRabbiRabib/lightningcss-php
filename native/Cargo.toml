@@ -2,13 +2,27 @@
 name = "lightningcss-php-shim"
 version = "0.1.0"
 edition = "2021"
-rust-version = "1.75.0"
+# The floor is the resolved dependency tree's own maximum: uuid 1.29
+# declares 1.89, and indexmap/hashbrown/unicode-segmentation declare 1.85 —
+# cargo refuses older toolchains on their behalf, so the shim declares the
+# same floor. The pinned toolchain is the rustup stable channel (1.98.1 at
+# the pin date); config.m4 enforces the same floor for early, actionable
+# configure failures.
+rust-version = "1.89.0"
 license = "Apache-2.0 OR MIT"
 publish = false
 
 [lib]
 name = "lightningcss_php"
 crate-type = ["staticlib"]
+
+# Pinned vendored engine (SHA-256 verified by tools/fetch-lightningcss.sh).
+# Default features (bundler, nodejs, sourcemap) are kept so the engine
+# compiles byte-identically to the oracle CLI; browserslist is added for
+# query resolution. The lockfile must resolve browserslist-rs 0.19.0 and
+# browserslist-data 0.1.1 — the same data versions as upstream's own lock.
+[dependencies]
+lightningcss = { path = "../vendor-src/lightningcss-1.33.0", features = ["browserslist"] }
 
 [profile.release]
 opt-level = 3
